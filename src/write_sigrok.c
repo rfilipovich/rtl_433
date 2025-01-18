@@ -26,6 +26,15 @@
 #include "fatal.h"
 #include "write_sigrok.h"
 
+/* Glue for systems without a MMU that cannot provide fork() */
+#if !defined(HAVE_FORK)
+# undef NOMMU_SYSTEM
+# define NOMMU_SYSTEM 1
+#endif
+#if NOMMU_SYSTEM
+# define fork() vfork()
+#endif
+
 void write_sigrok(char const *filename, unsigned samplerate, unsigned probes, unsigned analogs, char const *labels[])
 {
     // e.g. uses channels

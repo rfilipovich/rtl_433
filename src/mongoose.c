@@ -9200,6 +9200,16 @@ static int mg_start_process(const char *interp, const char *cmd,
   return (pi.hProcess != NULL);
 }
 #else
+
+/* Glue for systems without a MMU that cannot provide fork() */
+#if !defined(HAVE_FORK)
+# undef NOMMU_SYSTEM
+# define NOMMU_SYSTEM 1
+#endif
+#if NOMMU_SYSTEM
+# define fork() vfork()
+#endif
+
 static int mg_start_process(const char *interp, const char *cmd,
                             const char *env, const char *envp[],
                             const char *dir, sock_t sock) {
